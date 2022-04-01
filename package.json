@@ -1,0 +1,24 @@
+{
+  "name": "app-read-book",
+  "version": "1.0.0",
+  "description": "my first app ",
+  "main": "app.js",
+  "scripts": {
+    "start": "npm run build && node server.js"
+  },
+  "keywords": [
+    "example",
+    "heroku"
+  ],
+  "author": "anhnkd",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  },
+  "engines": {
+    "node": "10.x"
+  }
+}
