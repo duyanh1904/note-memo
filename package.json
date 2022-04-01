@@ -4,7 +4,7 @@
   "description": "my first app ",
   "main": "app.js",
   "scripts": {
-    "start": "npm run build && node server.js"
+    "start": "node app.js"
   },
   "keywords": [
     "example",
