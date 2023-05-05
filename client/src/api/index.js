@@ -1,8 +1,6 @@
 import axios from 'axios';
 
-// const API = axios.create({ baseURL: 'http://localhost:5000' });
-const API = axios.create({ baseURL: 'https://note-backend-d8d4.onrender.com' });
-// const API = axios.create({ baseURL: 'https://memories-app-1-2.herokuapp.com' });
+const API = axios.create({ baseURL: process.env.REACT_APP_API_URL });
 
 API.interceptors.request.use((req) => {
     if (localStorage.getItem('profile')) {
