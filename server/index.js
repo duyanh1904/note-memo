@@ -5,6 +5,7 @@ import cors from 'cors';
 
 import postRoutes from './routes/posts.js';
 import userRoutes from './routes/user.js';
+import job from './cron/base.js';
 
 const app = express();
 
