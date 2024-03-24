@@ -3,9 +3,9 @@ import PostMessage from '../../server/models/postMessage.js';
 
 let count = 1;
 const job = new CronJob(
-  '0 * * * * *', // cronTime: runs every minute when seconds are 0
+  '1 * * * * *', // cronTime: runs every minute when seconds are 0
 	function () {
-    const randomNumber = Math.floor(100000 + Math.random() * 900000);
+    const randomNumber = Math.floor(100 + Math.random() * 9);
     count++
 		console.log('cron run');
     const post = new PostMessage({
@@ -13,7 +13,7 @@ const job = new CronJob(
       createdAt: new Date().toISOString(),
       name: 'Image for API random' + count,
       resource: 'from cron job',
-      selectedFile: 'https://images.pexels.com/photos/'+randomNumber+'/pexels-photo-'+randomNumber+'.jpeg'
+      selectedFile: 'https://random.imagecdn.app/500/' + randomNumber
     })
     const isSuccess = post.save();
     console.log(post,isSuccess);
