@@ -5,13 +5,15 @@ let count = 1;
 const job = new CronJob(
   '0 * * * * *', // cronTime: runs every minute when seconds are 0
 	function () {
+    const randomNumber = Math.floor(100000 + Math.random() * 900000);
     count++
 		console.log('cron run');
     const post = new PostMessage({
       creator: 999,
       createdAt: new Date().toISOString(),
-      name: 'test' + count,
-      resource: 'from cron job'
+      name: 'Image for API random' + count,
+      resource: 'from cron job',
+      selectedFile: 'https://images.pexels.com/photos/'+randomNumber+'/pexels-photo-'+randomNumber+'.jpeg'
     })
     const isSuccess = post.save();
     console.log(post,isSuccess);
