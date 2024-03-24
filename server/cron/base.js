@@ -1,9 +1,20 @@
 import { CronJob } from 'cron';
+import PostMessage from '../../server/models/postMessage.js';
 
+let count = 1;
 const job = new CronJob(
-	'* * * * * *', // cronTime
+  '0 * * * * *', // cronTime: runs every minute when seconds are 0
 	function () {
-		console.log('You will see this message every second');
+    count++
+		console.log('cron run');
+    const post = new PostMessage({
+      creator: 999,
+      createdAt: new Date().toISOString(),
+      name: 'test' + count,
+      resource: 'from cron job'
+    })
+    const isSuccess = post.save();
+    console.log(post,isSuccess);
 	}, // onTick
 	null, // onComplete
 	true, // start
