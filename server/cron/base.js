@@ -7,7 +7,7 @@ let count = 1;
 // Define async function outside the cron job
 const generateImageEveryMinute = async () => {
   try {
-    const imageUrl = await getNeko();
+    const imageUrl = await getShibaRandomImage();
     const randomNumber = Math.floor(100 + Math.random() * 9);
     count++;
 
@@ -39,10 +39,10 @@ const job = new CronJob(
 
 // job.start() is optional here because of the fourth parameter set to true.
 
-async function getNeko() {
-  const response = await fetch('https://nekos.best/api/v2/neko');
+async function getShibaRandomImage() {
+  const response = await fetch('https://shibe.online/api/shibes?count=1');
   const json = await response.json();
-  return json.results[0].url;
+  return json[0];
 }
 
 export default job;
