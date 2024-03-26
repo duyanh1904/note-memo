@@ -8,6 +8,7 @@ let count = 1;
 const generateImageEveryMinute = async () => {
   try {
     const imageUrl = await getShibaRandomImage();
+    const quote = await getRandomQuote();
     const randomNumber = Math.floor(100 + Math.random() * 9);
     count++;
 
@@ -18,6 +19,9 @@ const generateImageEveryMinute = async () => {
       createdAt: new Date().toISOString(),
       name: 'Image for API random' + count,
       resource: 'from cron job',
+      message: quote['content'],
+      name: quote['author'],
+      tags: quote['tags'],
       selectedFile: imageUrl
     });
 
@@ -30,7 +34,7 @@ const generateImageEveryMinute = async () => {
 };
 
 const job = new CronJob(
-  '0 * * * * *', // cronTime: runs every minute when seconds are 0
+  '1 * * * * *', // cronTime: runs every minute when seconds are 0
 	generateImageEveryMinute, // onTick: Execute the async function
 	null, // onComplete
 	true, // start
@@ -44,5 +48,9 @@ async function getShibaRandomImage() {
   const json = await response.json();
   return json[0];
 }
-
+async function getRandomQuote() {
+  const response = await fetch('https://api.quotable.io/random');
+  const json = await response.json();
+  return json;
+}
 export default job;
