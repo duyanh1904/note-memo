@@ -15,7 +15,7 @@ const App = () => {
         <Routes>
           <Route path="/" exact element={<Navigate to="/posts" />} />
           <Route path="/posts" exact element={<Home />} />
-          <Route path="/posts/search?searchQuery" exact element={<Home />} />
+          <Route path="/posts/search" exact element={<Home />} />
           <Route path="/posts/:id" exact element={<PostDetails />} />
           <Route
             path="/auth"
