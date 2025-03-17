@@ -5,10 +5,10 @@ import fetch from "node-fetch"
 // Define async function outside the cron job
 const generateImageEveryMinute = async () => {
   try {
-    const imageUrl = await getShibaRandomImage()
     const quote = await getRandomQuote()
 
     console.log("cron run")
+    const randomId = Math.floor(Math.random() * 1001);
 
     const post = new PostMessage({
       creator: 999,
@@ -18,7 +18,7 @@ const generateImageEveryMinute = async () => {
       name: quote["author"],
       title: "Quote by " + quote["author"],
       tags: quote["tags"],
-      selectedFile: imageUrl,
+      selectedFile: `https://picsum.photos/id/${randomId}/200/300`,
     })
 
     // Wait for the save operation to complete
@@ -39,13 +39,9 @@ const job = new CronJob(
 
 // job.start() is optional here because of the fourth parameter set to true.
 
-async function getShibaRandomImage() {
-  const response = await fetch("https://shibe.online/api/shibes?count=1")
-  const json = await response.json()
-  return json[0]
-}
+
 async function getRandomQuote() {
-  const response = await fetch("https://api.quotable.io/random")
+  const response = await fetch("http://api.quotable.io/random")
   const json = await response.json()
   return json
 }
