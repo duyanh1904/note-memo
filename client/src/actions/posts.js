@@ -55,12 +55,9 @@ export const likePost = (id, post) => async (dispatch) => {
 
 export const getPostsBySearch = (searchQuery) => async (dispatch) => {
   try {
-    const {
-      data: { data },
-    } = await api.fetchPostsBySearch(searchQuery)
-    console.log("search", data)
+    const { data } = await api.fetchPostsBySearch(searchQuery)
     dispatch({ type: FETCH_BY_SEARCH, payload: data })
   } catch (error) {
-    console.log(error)
+    console.log("Search error:", error)
   }
 }

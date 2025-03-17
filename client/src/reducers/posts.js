@@ -39,7 +39,9 @@ export default (state = initialState, action) => {
     case FETCH_BY_SEARCH:
       return {
         ...state,
-        posts: action.payload,
+        posts: action.payload.posts || action.payload || [],
+        totalPages: action.payload.totalPages || 1,
+        currentPage: action.payload.currentPage || 1,
       }
     case CREATE:
       return {

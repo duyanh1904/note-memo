@@ -35,7 +35,9 @@ export const Home = () => {
     if (search.trim() || tags) {
       dispatch(getPostsBySearch({ search, tags: tags.join(",") }))
       navigate(
-        `/posts/search?searchQuery=${search || "none"}&tags=${tags.join(",")}`
+        `/posts/search?searchQuery=${search || "none"}&tags=${tags.join(
+          ","
+        )}&page=1`
       )
     } else {
       navigate("/")

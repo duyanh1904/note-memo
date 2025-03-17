@@ -27,14 +27,37 @@ export const getPosts = async (req, res) => {
 }
 
 export const getPostsBySearch = async (req, res) => {
-  const { searchQuery, tags } = req.query
   try {
-    const title = new RegExp(searchQuery, "i")
-    const post = await PostMessage.find({
-      $or: [{ title }, { tags: { $in: tags.split(",") } }],
-    })
+    const { searchQuery } = req.query
+    const page = parseInt(req.query.page) || 1
+    const perPage = parseInt(req.query.perPage) || 10
+    const skip = (page - 1) * perPage
 
-    res.status(200).json({ data: post })
+    console.log("searchQuery", searchQuery)
+
+    const searchFilter = searchQuery
+      ? {
+          $or: [
+            { title: { $regex: searchQuery, $options: "i" } },
+            { message: { $regex: searchQuery, $options: "i" } },
+          ],
+        }
+      : {}
+
+    const postMessages = await PostMessage.find(searchFilter)
+      .sort({ _id: -1 })
+      .skip(skip)
+      .limit(perPage)
+
+    const totalPosts = await PostMessage.countDocuments(searchFilter)
+    const totalPages = Math.ceil(totalPosts / perPage)
+
+    res.status(200).json({
+      posts: postMessages,
+      currentPage: page,
+      totalPages: totalPages,
+      totalPosts: totalPosts,
+    })
   } catch (error) {
     res.status(404).json({ message: error.message })
   }
