@@ -7,21 +7,46 @@ import {
   FETCH_BY_SEARCH,
 } from "../constants/actionTypes"
 
-export default (posts = [], action) => {
+// Initial state is an object with posts array, totalPages, and currentPage
+const initialState = {
+  posts: [],
+  totalPages: 0,
+  currentPage: 1,
+}
+
+export default (state = initialState, action) => {
   switch (action.type) {
     case DELETE:
-      return posts.filter((post) => post._id !== action.payload)
+      return {
+        ...state,
+        posts: state.posts.filter((post) => post._id !== action.payload),
+      }
     case UPDATE:
     case LIKE:
-      return posts.map((post) =>
-        post._id === action.payload._id ? action.payload : post
-      )
+      return {
+        ...state,
+        posts: state.posts.map((post) =>
+          post._id === action.payload._id ? action.payload : post
+        ),
+      }
     case FETCH_ALL:
+      return {
+        ...state,
+        posts: action.payload.posts,
+        totalPages: action.payload.totalPages,
+        currentPage: action.payload.currentPage,
+      }
     case FETCH_BY_SEARCH:
-      return action.payload
+      return {
+        ...state,
+        posts: action.payload,
+      }
     case CREATE:
-      return [...posts, action.payload]
+      return {
+        ...state,
+        posts: [...state.posts, action.payload],
+      }
     default:
-      return posts
+      return state
   }
 }

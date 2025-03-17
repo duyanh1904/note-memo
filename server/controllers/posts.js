@@ -3,12 +3,24 @@ import PostMessage from "../models/postMessage.js"
 
 export const getPosts = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
-    const perPage = parseInt(req.query.perPage) || 10; // Default to 10 items per page
-    const skip = (page - 1) * perPage;
-    const postMessages = await PostMessage.find().sort({ _id: -1 }).skip(skip).limit(perPage)
+    const page = parseInt(req.query.page) || 1
+    const perPage = parseInt(req.query.perPage) || 10
+    const skip = (page - 1) * perPage
 
-    res.status(200).json(postMessages)
+    const postMessages = await PostMessage.find()
+      .sort({ _id: -1 })
+      .skip(skip)
+      .limit(perPage)
+
+    const totalPosts = await PostMessage.countDocuments()
+    const totalPages = Math.ceil(totalPosts / perPage)
+
+    res.status(200).json({
+      posts: postMessages,
+      currentPage: page,
+      totalPages: totalPages,
+      totalPosts: totalPosts,
+    })
   } catch (error) {
     res.status(404).json({ message: error.message })
   }

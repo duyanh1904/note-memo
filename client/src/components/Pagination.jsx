@@ -1,43 +1,41 @@
-import React, { useEffect } from 'react';
-import { Pagination, PaginationItem } from '@material-ui/lab';
-import { Link, useLocation } from 'react-router-dom'; // Add useLocation
-import { useDispatch, useSelector } from 'react-redux';
-import useStyles from './styles.js';
-import { getPosts } from '../actions/posts'; // Adjust the path to your action file
+import React, { useEffect } from "react"
+import { Pagination, PaginationItem } from "@material-ui/lab"
+import { Link, useLocation, useNavigate } from "react-router-dom" // Add useNavigate
+import { useDispatch, useSelector } from "react-redux"
+import useStyles from "./styles.js"
+import { getPosts } from "../actions/posts" // Adjust the path to your action file
 
 const Paginate = () => {
-  const classes = useStyles();
-  const dispatch = useDispatch();
-  const location = useLocation(); // Get URL info
+  const classes = useStyles()
+  const dispatch = useDispatch()
+  const location = useLocation()
 
-  // Extract page from URL query (e.g., ?page=2)
-  const query = new URLSearchParams(location.search);
-  const page = parseInt(query.get('page')) || 1; // Default to 1 if not in URL
+  const query = new URLSearchParams(location.search)
+  const page = parseInt(query.get("page")) || 1
 
-  // Get pagination data from Redux store
-  const { totalPages } = useSelector((state) => state.posts);
+  const { posts, totalPages, isLoading } = useSelector((state) => state.posts)
 
   // Fetch posts when the page changes
   useEffect(() => {
-    dispatch(getPosts(page)); // Dispatch action to fetch posts for the current page
-  }, [dispatch, page]);
+    dispatch(getPosts(page))
+  }, [dispatch, page])
 
   return (
     <Pagination
       classes={{ ul: classes.ul }}
-      count={totalPages || 5} // Total pages from Redux, default to 5 if not available
-      page={page} // Use page from URL query
+      count={totalPages || 1} // Default to 1 instead of 5 if totalPages isn’t available
+      page={page}
       variant="outlined"
       color="primary"
       renderItem={(item) => (
         <PaginationItem
           {...item}
           component={Link}
-          to={`/posts?page=${item.page}`} // Dynamic page link
+          to={`/posts?page=${item.page}`}
         />
       )}
     />
-  );
-};
+  )
+}
 
-export default Paginate;
+export default Paginate
