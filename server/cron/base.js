@@ -30,7 +30,7 @@ const generateImageEveryMinute = async () => {
 }
 
 const job = new CronJob(
-  "2 * * * * *", // cronTime: runs every minute when seconds are 0
+  "0 */10 * * * *", // cronTime: every 10 minutes
   generateImageEveryMinute, // onTick: Execute the async function
   null, // onComplete
   true, // start
