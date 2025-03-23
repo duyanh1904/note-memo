@@ -1,0 +1,56 @@
+.pacman-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #1a1a1a;
+    padding: 20px;
+    touch-action: none;
+}
+
+.pacman-title {
+    color: #ffd700;
+    font-family: 'Arial', sans-serif;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.pacman-canvas {
+    background-color: #000;
+    border: 2px solid #ffd700;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+    touch-action: none;
+}
+
+.instructions {
+    color: #fff;
+    font-family: 'Arial', sans-serif;
+    font-size: 1.1rem;
+    margin-top: 20px;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.pacman-container:hover .pacman-canvas {
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+}
+
+@media (max-width: 480px) {
+    .pacman-title {
+        font-size: 1.8rem;
+    }
+
+    .pacman-canvas {
+        width: 300px !important;
+        height: 220px !important;
+    }
+
+    .instructions {
+        font-size: 0.9rem;
+    }
+}
