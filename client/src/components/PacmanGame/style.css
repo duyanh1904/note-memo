@@ -1,3 +1,10 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
 .pacman-container {
     display: flex;
     flex-direction: column;
@@ -7,6 +14,12 @@
     background-color: #1a1a1a;
     padding: 20px;
     touch-action: none;
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
 
 .pacman-title {
@@ -23,6 +36,8 @@
     border-radius: 8px;
     box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
     touch-action: none;
+    width: 300px;
+    height: 220px;
 }
 
 .instructions {
@@ -46,8 +61,8 @@
     }
 
     .pacman-canvas {
-        width: 300px !important;
-        height: 220px !important;
+        width: 300px;
+        height: 220px;
     }
 
     .instructions {
