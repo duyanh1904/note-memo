@@ -12,7 +12,9 @@ class PacmanGame {
       direction: 'right',
       speed: 0.1,
       mouthAngle: 0,
-      mouthOpening: true
+      mouthOpening: true,
+      isPowered: false,
+      powerTimer: 0
     };
 
     this.ghost = {
@@ -20,6 +22,12 @@ class PacmanGame {
       y: 8,
       speed: 0.08,
       color: 'red'
+    };
+
+    this.fruit = {
+      x: 7,
+      y: 5,
+      eaten: false
     };
 
     this.map = [
@@ -105,6 +113,15 @@ class PacmanGame {
 
     this.pacman.mouthAngle += this.pacman.mouthOpening ? 0.1 : -0.1;
     this.pacman.mouthOpening = this.pacman.mouthAngle >= 0.5 ? false : this.pacman.mouthAngle <= 0 ? true : this.pacman.mouthOpening;
+
+    if (this.pacman.isPowered) {
+      this.pacman.powerTimer--;
+      if (this.pacman.powerTimer <= 0) {
+        this.pacman.isPowered = false;
+      }
+    }
+
+    this.checkFruitCollision();
   }
 
   moveGhost() {
@@ -113,15 +130,29 @@ class PacmanGame {
     const dx = this.pacman.x - this.ghost.x;
     const dy = this.pacman.y - this.ghost.y;
     const { speed } = this.ghost;
-    let newX = this.ghost.x + (Math.abs(dx) > Math.abs(dy) ? Math.sign(dx) * speed : 0);
-    let newY = this.ghost.y + (Math.abs(dy) >= Math.abs(dx) ? Math.sign(dy) * speed : 0);
+
+    let newX, newY;
+    if (this.pacman.isPowered) {
+      newX = this.ghost.x + (Math.abs(dx) > Math.abs(dy) ? -Math.sign(dx) * speed : 0);
+      newY = this.ghost.y + (Math.abs(dy) >= Math.abs(dx) ? -Math.sign(dy) * speed : 0);
+    } else {
+      newX = this.ghost.x + (Math.abs(dx) > Math.abs(dy) ? Math.sign(dx) * speed : 0);
+      newY = this.ghost.y + (Math.abs(dy) >= Math.abs(dx) ? Math.sign(dy) * speed : 0);
+    }
 
     if (this.canMove(newX, newY)) {
       this.ghost.x = newX;
       this.ghost.y = newY;
     }
 
-    if (this.checkCollision()) this.endGame();
+    if (this.checkCollision()) {
+      if (this.pacman.isPowered) {
+        this.ghost.x = 13;
+        this.ghost.y = 8;
+      } else {
+        this.endGame();
+      }
+    }
   }
 
   canMove(x, y) {
@@ -148,6 +179,30 @@ class PacmanGame {
     return dx < 0.5 && dy < 0.5;
   }
 
+  checkFruitCollision() {
+    if (this.fruit.eaten) return;
+
+    const dx = Math.abs(this.pacman.x - this.fruit.x);
+    const dy = Math.abs(this.pacman.y - this.fruit.y);
+
+    if (dx < 0.5 && dy < 0.5) {
+      this.fruit.eaten = true;
+      this.pacman.isPowered = true;
+      this.pacman.powerTimer = 600;
+      this.ghost.color = 'blue';
+      setTimeout(() => {
+        if (!this.fruit.eaten) return;
+        this.fruit.eaten = false;
+        this.fruit.x = Math.floor(Math.random() * 13) + 1;
+        this.fruit.y = Math.floor(Math.random() * 9) + 1;
+        while (this.isWall(this.fruit.x, this.fruit.y)) {
+          this.fruit.x = Math.floor(Math.random() * 13) + 1;
+          this.fruit.y = Math.floor(Math.random() * 9) + 1;
+        }
+      }, 5000);
+    }
+  }
+
   endGame() {
     this.isGameOver = true;
     this.stop();
@@ -171,8 +226,18 @@ class PacmanGame {
 
   restart() {
     this.isGameOver = false;
-    this.pacman = { ...this.pacman, x: 1, y: 1, direction: 'right', mouthAngle: 0, mouthOpening: true };
-    this.ghost = { ...this.ghost, x: 13, y: 8 };
+    this.pacman = {
+      ...this.pacman,
+      x: 1,
+      y: 1,
+      direction: 'right',
+      mouthAngle: 0,
+      mouthOpening: true,
+      isPowered: false,
+      powerTimer: 0
+    };
+    this.ghost = { ...this.ghost, x: 13, y: 8, color: 'red' };
+    this.fruit = { x: 7, y: 5, eaten: false };
     this.start();
   }
 
@@ -190,8 +255,20 @@ class PacmanGame {
     }
   }
 
+  drawFruit() {
+    if (this.fruit.eaten) return;
+
+    const fruitX = this.fruit.x * this.tileSize + this.tileSize/2;
+    const fruitY = this.fruit.y * this.tileSize + this.tileSize/2;
+
+    this.ctx.fillStyle = 'orange';
+    this.ctx.beginPath();
+    this.ctx.arc(fruitX, fruitY, this.tileSize/3, 0, Math.PI * 2);
+    this.ctx.fill();
+  }
+
   drawPacman() {
-    const { x, y, direction, mouthAngle } = this.pacman;
+    const { x, y, direction, mouthAngle, isPowered } = this.pacman;
     const pacX = x * this.tileSize + this.tileSize/2;
     const pacY = y * this.tileSize + this.tileSize/2;
 
@@ -202,7 +279,7 @@ class PacmanGame {
       down: [3*Math.PI/2 + mouthAngle, 3*Math.PI/2 - mouthAngle]
     };
 
-    this.ctx.fillStyle = '#ff69b4';
+    this.ctx.fillStyle = isPowered ? '#00ffff' : '#ff69b4';
     this.ctx.beginPath();
     this.ctx.arc(pacX, pacY, this.tileSize/2, angles[direction][0], angles[direction][1]);
     this.ctx.lineTo(pacX, pacY);
@@ -214,7 +291,6 @@ class PacmanGame {
     const ghostX = x * this.tileSize + this.tileSize/2;
     const ghostY = y * this.tileSize + this.tileSize/2;
 
-    // Body
     this.ctx.fillStyle = color;
     this.ctx.beginPath();
     this.ctx.arc(ghostX, ghostY - this.tileSize/4, this.tileSize/2, Math.PI, 0);
@@ -222,7 +298,6 @@ class PacmanGame {
     skirt.forEach(([dx, dy]) => this.ctx.lineTo(ghostX + dx * this.tileSize, ghostY + dy * this.tileSize));
     this.ctx.fill();
 
-    // Eyes
     this.ctx.fillStyle = 'white';
     this.ctx.beginPath();
     [-1/5, 1/5].forEach(dx =>
@@ -230,7 +305,6 @@ class PacmanGame {
     );
     this.ctx.fill();
 
-    // Pupils
     this.ctx.fillStyle = 'black';
     this.ctx.beginPath();
     [-1/5, 1/5].forEach(dx =>
@@ -242,6 +316,7 @@ class PacmanGame {
   draw() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.drawMap();
+    this.drawFruit();
     this.drawPacman();
     this.drawGhost();
   }
@@ -250,6 +325,10 @@ class PacmanGame {
     this.movePacman();
     this.moveGhost();
     this.draw();
+
+    if (!this.pacman.isPowered && this.ghost.color === 'blue') {
+      this.ghost.color = 'red';
+    }
   }
 
   start() {
