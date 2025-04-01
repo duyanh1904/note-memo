@@ -24,10 +24,10 @@ class PacmanGame {
       color: 'red'
     };
 
-    this.fruit = {
-      x: 7,
-      y: 5,
-      eaten: false
+    this.foods = {
+      fruit: { x: 7, y: 5, eaten: false, type: 'fruit' },
+      burger: { x: 3, y: 3, eaten: false, type: 'burger' },
+      pizza: { x: 11, y: 7, eaten: false, type: 'pizza' }
     };
 
     this.map = [
@@ -118,10 +118,11 @@ class PacmanGame {
       this.pacman.powerTimer--;
       if (this.pacman.powerTimer <= 0) {
         this.pacman.isPowered = false;
+        this.pacman.speed = 0.1; // Reset to default speed
       }
     }
 
-    this.checkFruitCollision();
+    this.checkFoodCollision();
   }
 
   moveGhost() {
@@ -179,28 +180,46 @@ class PacmanGame {
     return dx < 0.5 && dy < 0.5;
   }
 
-  checkFruitCollision() {
-    if (this.fruit.eaten) return;
+  checkFoodCollision() {
+    Object.values(this.foods).forEach(food => {
+      if (food.eaten) return;
 
-    const dx = Math.abs(this.pacman.x - this.fruit.x);
-    const dy = Math.abs(this.pacman.y - this.fruit.y);
+      const dx = Math.abs(this.pacman.x - food.x);
+      const dy = Math.abs(this.pacman.y - food.y);
 
-    if (dx < 0.5 && dy < 0.5) {
-      this.fruit.eaten = true;
-      this.pacman.isPowered = true;
-      this.pacman.powerTimer = 600;
-      this.ghost.color = 'blue';
-      setTimeout(() => {
-        if (!this.fruit.eaten) return;
-        this.fruit.eaten = false;
-        this.fruit.x = Math.floor(Math.random() * 13) + 1;
-        this.fruit.y = Math.floor(Math.random() * 9) + 1;
-        while (this.isWall(this.fruit.x, this.fruit.y)) {
-          this.fruit.x = Math.floor(Math.random() * 13) + 1;
-          this.fruit.y = Math.floor(Math.random() * 9) + 1;
+      if (dx < 0.5 && dy < 0.5) {
+        food.eaten = true;
+        this.pacman.isPowered = true;
+
+        // Different effects for each food type
+        switch(food.type) {
+          case 'fruit':
+            this.pacman.powerTimer = 600; // 10 seconds power
+            this.ghost.color = 'blue';
+            break;
+          case 'burger':
+            this.pacman.powerTimer = 300; // 5 seconds power
+            this.pacman.speed = 0.15; // Speed boost
+            this.ghost.color = 'blue';
+            break;
+          case 'pizza':
+            this.pacman.powerTimer = 900; // 15 seconds power
+            this.ghost.color = 'blue';
+            break;
         }
-      }, 5000);
-    }
+
+        setTimeout(() => {
+          if (!food.eaten) return;
+          food.eaten = false;
+          food.x = Math.floor(Math.random() * 13) + 1;
+          food.y = Math.floor(Math.random() * 9) + 1;
+          while (this.isWall(food.x, food.y)) {
+            food.x = Math.floor(Math.random() * 13) + 1;
+            food.y = Math.floor(Math.random() * 9) + 1;
+          }
+        }, 5000);
+      }
+    });
   }
 
   endGame() {
@@ -234,10 +253,15 @@ class PacmanGame {
       mouthAngle: 0,
       mouthOpening: true,
       isPowered: false,
-      powerTimer: 0
+      powerTimer: 0,
+      speed: 0.1
     };
     this.ghost = { ...this.ghost, x: 13, y: 8, color: 'red' };
-    this.fruit = { x: 7, y: 5, eaten: false };
+    this.foods = {
+      fruit: { x: 7, y: 5, eaten: false, type: 'fruit' },
+      burger: { x: 3, y: 3, eaten: false, type: 'burger' },
+      pizza: { x: 11, y: 7, eaten: false, type: 'pizza' }
+    };
     this.start();
   }
 
@@ -255,16 +279,47 @@ class PacmanGame {
     }
   }
 
-  drawFruit() {
-    if (this.fruit.eaten) return;
+  drawFood() {
+    Object.values(this.foods).forEach(food => {
+      if (food.eaten) return;
+      const foodX = food.x * this.tileSize + this.tileSize/2;
+      const foodY = food.y * this.tileSize + this.tileSize/2;
 
-    const fruitX = this.fruit.x * this.tileSize + this.tileSize/2;
-    const fruitY = this.fruit.y * this.tileSize + this.tileSize/2;
-
-    this.ctx.fillStyle = 'orange';
-    this.ctx.beginPath();
-    this.ctx.arc(fruitX, fruitY, this.tileSize/3, 0, Math.PI * 2);
-    this.ctx.fill();
+      switch(food.type) {
+        case 'fruit':
+          this.ctx.fillStyle = 'orange';
+          this.ctx.beginPath();
+          this.ctx.arc(foodX, foodY, this.tileSize/3, 0, Math.PI * 2);
+          this.ctx.fill();
+          break;
+        case 'burger':
+          // Simple burger shape
+          this.ctx.fillStyle = '#8B4513'; // Brown bun
+          this.ctx.fillRect(foodX - this.tileSize/3, foodY - this.tileSize/3, this.tileSize*2/3, this.tileSize/6);
+          this.ctx.fillStyle = '#228B22'; // Lettuce
+          this.ctx.fillRect(foodX - this.tileSize/3, foodY - this.tileSize/6, this.tileSize*2/3, this.tileSize/6);
+          this.ctx.fillStyle = '#CD853F'; // Patty
+          this.ctx.fillRect(foodX - this.tileSize/3, foodY, this.tileSize*2/3, this.tileSize/6);
+          this.ctx.fillStyle = '#8B4513'; // Bottom bun
+          this.ctx.fillRect(foodX - this.tileSize/3, foodY + this.tileSize/6, this.tileSize*2/3, this.tileSize/6);
+          break;
+        case 'pizza':
+          // Simple pizza slice
+          this.ctx.fillStyle = '#DAA520'; // Crust
+          this.ctx.beginPath();
+          this.ctx.moveTo(foodX, foodY);
+          this.ctx.lineTo(foodX - this.tileSize/3, foodY - this.tileSize/3);
+          this.ctx.lineTo(foodX + this.tileSize/3, foodY - this.tileSize/3);
+          this.ctx.fill();
+          this.ctx.fillStyle = '#FF4500'; // Sauce
+          this.ctx.beginPath();
+          this.ctx.moveTo(foodX, foodY - this.tileSize/12);
+          this.ctx.lineTo(foodX - this.tileSize/4, foodY - this.tileSize/4);
+          this.ctx.lineTo(foodX + this.tileSize/4, foodY - this.tileSize/4);
+          this.ctx.fill();
+          break;
+      }
+    });
   }
 
   drawPacman() {
@@ -316,7 +371,7 @@ class PacmanGame {
   draw() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.drawMap();
-    this.drawFruit();
+    this.drawFood();
     this.drawPacman();
     this.drawGhost();
   }
