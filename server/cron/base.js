@@ -13,7 +13,7 @@ const generateImageEveryMinute = async () => {
     const post = new PostMessage({
       creator: 999,
       createdAt: new Date().toISOString(),
-      resource: "from cron job",
+      resource: "from cron job", 
       message: quote["content"],
       name: quote["author"],
       title: "Quote by " + quote["author"],
@@ -24,8 +24,10 @@ const generateImageEveryMinute = async () => {
     // Wait for the save operation to complete
     const isSuccess = await post.save()
     console.log(post, isSuccess)
+    return isSuccess
   } catch (error) {
     console.error("Error in cron job:", error)
+    throw error
   }
 }
 
@@ -37,12 +39,11 @@ const job = new CronJob(
   "America/Los_Angeles" // timeZone
 )
 
-// job.start() is optional here because of the fourth parameter set to true.
-
-
 async function getRandomQuote() {
   const response = await fetch("http://api.quotable.io/random")
   const json = await response.json()
   return json
 }
+
+export { generateImageEveryMinute, getRandomQuote }
 export default job
